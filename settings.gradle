@@ -1,0 +1,6 @@
+rootProject.name = 'jmh-shared-test-poc'
+
+include 'common'
+include 'orm6'
+include 'orm5'
+

@@ -1,0 +1,67 @@
+import java.nio.file.Files
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+    }
+    dependencies {
+        classpath 'me.champeau.gradle:jmh-gradle-plugin:0.4.8'
+    }
+}
+
+task jmh {
+    // NOTE this is not the jmh task from the jmh plugin.  It is merely a "grouping task"
+    // for things to do when the benchmarks are run from the root - mainly creating a
+    // unified report
+
+    doLast {
+        getLogger().lifecycle( "Generating shared JMH result report" );
+
+		// todo : generate the report :)
+    }
+}
+
+// NOTE : the benchmark project also define a `benchmark` alias for the `jmh`
+// task.  Allow that to be run from the root as well.
+task benchmark( dependsOn: [tasks.jmh] )
+
+allprojects {
+    group 'org.hibernate.sebersole.benchmarks'
+    version '1.0-SNAPSHOT'
+}
+
+
+wrapper {
+    gradleVersion = '4.10.3'
+    distributionType = Wrapper.DistributionType.ALL
+
+    doLast {
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Create gradlew links for each sub-project in its project dir
+
+        def realScriptPath = scriptFile.toPath()
+
+        subprojects { Project sub ->
+            // Windows - create a relative file that calls the "real" gradlew
+            def gradlewBatFile = new File( sub.projectDir, "gradlew.bat" );
+            if ( ! gradlewBatFile.exists() ) {
+                gradlewBatFile.createNewFile()
+                gradlewBatFile.text = 'call ' + scriptFile.absolutePath
+                gradlewBatFile.executable = true
+            }
+
+
+            // *nix (yes, Mac is linux based) - create a symlink to the "real" gradlew
+            def symLinkRef = new File( sub.projectDir, "gradlew" )
+            def symlinkPath = symLinkRef.toPath()
+
+            Files.deleteIfExists( symlinkPath )
+            Files.createSymbolicLink( symlinkPath, realScriptPath );
+
+        }
+    }
+}

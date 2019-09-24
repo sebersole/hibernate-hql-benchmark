@@ -1,0 +1,31 @@
+
+apply from: rootProject.file( 'gradle/java-module.gradle' )
+
+apply plugin: "me.champeau.gradle.jmh"
+
+dependencies {
+	compile project( ':common' )
+
+	compile 'javax.persistence:javax.persistence-api:2.2'
+
+	runtime libraries.h2
+}
+
+jmh {
+	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
+
+	benchmarkMode = ['avgt']
+
+	iterations = 20 //default 10
+	fork = 2 //default 10
+	warmupIterations = 20 // Number of warmup iterations to do.
+
+	def formattedDate = new Date().format( 'yyyy-MM-dd-HHmmss' )
+
+	resultFormat = 'JSON'
+	resultsFile = project.file( "${buildDir}/reports/jmh/results_${formattedDate}.txt" )
+
+	humanOutputFile = project.file( "${buildDir}/reports/jmh/human_${formattedDate}.txt" )
+}
+
+task benchmark( dependsOn: [tasks.jmh] )
