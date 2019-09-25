@@ -10,11 +10,7 @@
 
 repositories {
 	mavenCentral()
-
-	maven {
-		name "jboss-snapshots"
-		url 'https://repository.jboss.org/nexus/content/repositories/snapshots'
-	}
+	mavenLocal()
 }
 
 apply plugin: 'java'
