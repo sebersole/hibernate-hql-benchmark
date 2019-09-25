@@ -9,7 +9,7 @@ package org.hibernate.sebersole.benchmarks.poc.orm6;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.query.hql.internal.HqlParser;
 import org.hibernate.query.hql.internal.SemanticQueryBuilder;
-import org.hibernate.query.sqm.produce.internal.SqmCreationOptionsStandard;
+import org.hibernate.query.sqm.internal.SqmCreationOptionsStandard;
 import org.hibernate.sebersole.benchmarks.poc.HqlSemanticTreeBuilder;
 
 /**
