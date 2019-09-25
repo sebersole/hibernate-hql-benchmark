@@ -6,7 +6,14 @@
  */
 package org.hibernate.sebersole.benchmarks.poc;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+import org.hibernate.sebersole.benchmarks.poc.model.Animal;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -15,40 +22,6 @@ import org.openjdk.jmh.annotations.OutputTimeUnit;
 
 @SuppressWarnings("unused")
 public class BenchmarkTests {
-
-//	@Benchmark
-//	@BenchmarkMode(Mode.AverageTime)
-//	@OutputTimeUnit(TimeUnit.MICROSECONDS)
-//	public Object simpleSelect(BenchmarkState state) {
-//		return getSemanticModel( "select a from Animal a", state );
-//	}
-//
-//	@Benchmark
-//	@BenchmarkMode(Mode.AverageTime)
-//	@OutputTimeUnit(TimeUnit.MICROSECONDS)
-//	public Object simpleSelect_multiple(BenchmarkState state) {
-//		return getSemanticModel(
-//				"select a.serialNumber, a.mother, a.father, a.description, a.zoo from Animal a",
-//				state
-//		);
-//	}
-//
-//	@Benchmark
-//	@BenchmarkMode(Mode.AverageTime)
-//	@OutputTimeUnit(TimeUnit.MICROSECONDS)
-//	public Object simpleWhere(BenchmarkState state) {
-//		return getSemanticModel( "select a from Animal a where a.serialNumber = '1337'", state );
-//	}
-//
-//	@Benchmark
-//	@BenchmarkMode(Mode.AverageTime)
-//	@OutputTimeUnit(TimeUnit.MICROSECONDS)
-//	public Object simpleWhere_multiple(BenchmarkState state) {
-//		return getSemanticModel(
-//				"select a from Animal a where a.serialNumber = '1337' and a.zoo.address.city = 'London' and a.zoo.address.country = 'US'",
-//				state
-//		);
-//	}
 
 	@Benchmark
 	@BenchmarkMode( Mode.AverageTime )
@@ -60,6 +33,21 @@ public class BenchmarkTests {
 		);
 	}
 
+//	@Benchmark
+//	@BenchmarkMode( Mode.AverageTime )
+//	@OutputTimeUnit(TimeUnit.MICROSECONDS)
+//	public void simplePathPredicateExecution(BenchmarkState state) {
+//		final EntityManager entityManager = state.getEntityManagerFactory().createEntityManager();
+//		final TypedQuery<Animal> query = entityManager.createQuery(
+//				"select a from Animal a where a.mother.description = :description",
+//				Animal.class
+//		);
+//		final List<Animal> resultList = query.getResultList();
+//		for ( Animal animal : resultList ) {
+//			System.out.println( "Animal : " + animal );
+//		}
+//	}
+
 	@Benchmark
 	@BenchmarkMode( Mode.AverageTime )
 	@OutputTimeUnit(TimeUnit.MICROSECONDS)
@@ -70,6 +58,21 @@ public class BenchmarkTests {
 		);
 	}
 
+//	@Benchmark
+//	@BenchmarkMode( Mode.AverageTime )
+//	@OutputTimeUnit(TimeUnit.MICROSECONDS)
+//	public void nestedPathPredicateExecution(BenchmarkState state) {
+//		final EntityManager entityManager = state.getEntityManagerFactory().createEntityManager();
+//		final TypedQuery<Animal> query = entityManager.createQuery(
+//				"select a from Animal a where a.mother.mother.description = :description",
+//				Animal.class
+//		);
+//		final List<Animal> resultList = query.getResultList();
+//		for ( Animal animal : resultList ) {
+//			System.out.println( "Animal : " + animal );
+//		}
+//	}
+
 	@Benchmark
 	@BenchmarkMode( Mode.AverageTime )
 	@OutputTimeUnit(TimeUnit.MICROSECONDS)
@@ -79,6 +82,21 @@ public class BenchmarkTests {
 				state
 		);
 	}
+
+//	@Benchmark
+//	@BenchmarkMode( Mode.AverageTime )
+//	@OutputTimeUnit(TimeUnit.MICROSECONDS)
+//	public void deeplyNestedPathPredicateExecution(BenchmarkState state) {
+//		final EntityManager entityManager = state.getEntityManagerFactory().createEntityManager();
+//		final TypedQuery<Animal> query = entityManager.createQuery(
+//				"select a from Animal a where a.mother.mother.mother.mother.description = :description",
+//				Animal.class
+//		);
+//		final List<Animal> resultList = query.getResultList();
+//		for ( Animal animal : resultList ) {
+//			System.out.println( "Animal : " + animal );
+//		}
+//	}
 
 	private Object getSemanticModel(String query, BenchmarkState benchmarkState) {
 		return benchmarkState.getHqlSemanticTreeBuilder().buildSemanticModel( query );

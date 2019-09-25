@@ -6,7 +6,7 @@ apply plugin: "me.champeau.gradle.jmh"
 dependencies {
 	compile project( ':common' )
 
-	compile 'javax.persistence:javax.persistence-api:2.2'
+	compile libraries.jpa
 
 	runtime libraries.h2
 }

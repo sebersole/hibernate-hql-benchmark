@@ -6,6 +6,8 @@
  */
 package org.hibernate.sebersole.benchmarks.poc.orm5;
 
+import javax.persistence.EntityManagerFactory;
+
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -51,5 +53,10 @@ public class VersionSupportImpl implements HibernateVersionSupport {
 			catch (Exception ignore) {
 			}
 		}
+	}
+
+	@Override
+	public EntityManagerFactory getEntityManagerFactory() {
+		return sessionFactory;
 	}
 }

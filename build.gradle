@@ -34,6 +34,8 @@ allprojects {
     version '1.0-SNAPSHOT'
 }
 
+final String GRADLEW = 'gradlew'
+final String GRADLEW_BAT = GRADLEW + '.bat'
 
 wrapper {
     gradleVersion = '5.6.2'
@@ -43,24 +45,32 @@ wrapper {
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Create gradlew links for each sub-project in its project dir
 
-        def realScriptPath = scriptFile.toPath()
+        final File realWrapperScriptFile = rootProject.file( GRADLEW )
+        final File realWrapperBatScriptFile = rootProject.file( GRADLEW_BAT )
 
         subprojects { Project sub ->
-            // Windows - create a relative file that calls the "real" gradlew
-            def gradlewBatFile = new File( sub.projectDir, "gradlew.bat" );
-            if ( ! gradlewBatFile.exists() ) {
-                gradlewBatFile.createNewFile()
-                gradlewBatFile.text = 'call ' + scriptFile.absolutePath
-                gradlewBatFile.executable = true
-            }
 
-
+            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // *nix (yes, Mac is linux based) - create a symlink to the "real" gradlew
-            def symLinkRef = new File( sub.projectDir, "gradlew" )
+
+            def realWrapperRelativePath =  sub.relativePath( realWrapperScriptFile )
+            def symLinkRef = new File( sub.projectDir, GRADLEW )
             def symlinkPath = symLinkRef.toPath()
 
             Files.deleteIfExists( symlinkPath )
-            Files.createSymbolicLink( symlinkPath, realScriptPath );
+            Files.createSymbolicLink( symlinkPath, sub.file( realWrapperRelativePath ).toPath() );
+
+
+            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // Windows - create a relative file that calls the "real" gradlew
+
+            def realWrapperBatRelativePath =  sub.relativePath( realWrapperBatScriptFile )
+            def wrapperBatLinkFile = new File( sub.projectDir, GRADLEW_BAT )
+            if ( ! wrapperBatLinkFile.exists() ) {
+                wrapperBatLinkFile.createNewFile()
+                wrapperBatLinkFile.text = 'call ' + realWrapperBatRelativePath
+                wrapperBatLinkFile.executable = true
+            }
 
         }
     }

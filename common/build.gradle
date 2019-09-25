@@ -9,3 +9,7 @@ sourceCompatibility = 1.8
 repositories {
     mavenCentral()
 }
+
+dependencies {
+    compile libraries.jpa
+}

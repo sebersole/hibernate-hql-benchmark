@@ -18,8 +18,10 @@ ext {
     libraries = [
             jmh:        "org.openjdk.jmh:jmh-core:${jmhVersion}",
 
+            jpa: 'javax.persistence:javax.persistence-api:2.2',
+
             orm5: "org.hibernate:hibernate-core:${orm5Version}",
-            orm6: "org.hibernate:hibernate-core:${orm6Version}",
+            orm6: "org.hibernate.orm:hibernate-core:${orm6Version}",
 
             h2: "com.h2database:h2:${h2Version}",
 

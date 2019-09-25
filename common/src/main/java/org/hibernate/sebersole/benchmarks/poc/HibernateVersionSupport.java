@@ -6,6 +6,8 @@
  */
 package org.hibernate.sebersole.benchmarks.poc;
 
+import javax.persistence.EntityManagerFactory;
+
 /**
  * The main abstraction between different versions of Hibernate
  */
@@ -20,5 +22,7 @@ public interface HibernateVersionSupport {
 	 * Close the SessionFactory, etc
 	 */
 	void shutDown();
+
+	EntityManagerFactory getEntityManagerFactory();
 }
 

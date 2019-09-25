@@ -6,12 +6,19 @@ Currently running against 5.x and 6.x is supported.
 NOTE: Unfortunately JMH forces us to duplicate the benchmark test class(es) in each
 benchmark sub-project :(
 
+NOTE: In all cases, `gradlew benchmark` can be substituted for `gradlew jmh`
+
+
+== Hibernate ORM 6 testing
+
 To run the benchmark against Hibernate 6.x:
 
 ```
 cd orm6
 gradlew jmh
 ```
+
+== Hibernate ORM 5 testing
 
 To run the benchmark against Hibernate 5.x:
 
@@ -20,6 +27,8 @@ cd orm5
 gradlew jmh
 ```
 
+== Combined testing
+
 To run benchmark against all versions (and create a unified report):
 
 ```
@@ -27,5 +36,4 @@ cd {root}
 gradlew jmh
 ```
 
-NOTE: In all cases, `gradlew benchmark` can be substituted for `gradlew jmh`
 

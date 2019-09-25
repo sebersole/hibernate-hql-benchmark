@@ -9,6 +9,8 @@ package org.hibernate.sebersole.benchmarks.poc;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
+import javax.persistence.EntityManagerFactory;
+
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
@@ -23,6 +25,7 @@ public class BenchmarkState {
 	private HibernateVersionSupport versionSupport;
 
 	private HqlSemanticTreeBuilder hqlSemanticTreeBuilder;
+	private EntityManagerFactory emf;
 
 	@Setup
 	public void setUp() {
@@ -44,6 +47,7 @@ public class BenchmarkState {
 			versionSupport = factory.buildHibernateVersionSupport();
 
 			hqlSemanticTreeBuilder = versionSupport.getHqlSemanticInterpreter();
+			emf = versionSupport.getEntityManagerFactory();
 		}
 		catch (Throwable t) {
 			t.printStackTrace();
@@ -66,4 +70,7 @@ public class BenchmarkState {
 		return hqlSemanticTreeBuilder;
 	}
 
+	public EntityManagerFactory getEntityManagerFactory() {
+		return emf;
+	}
 }
