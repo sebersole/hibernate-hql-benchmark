@@ -8,4 +8,11 @@ build/
 
 .idea/
 out/
+target/
+common/gradlew
+orm5/gradlew
+orm6/gradlew
+common/gradlew.bat
+orm5/gradlew.bat
+orm6/gradlew.bat
 
