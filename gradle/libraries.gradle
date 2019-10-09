@@ -11,12 +11,12 @@ ext {
     jmhVersion = '1.21'
 
     orm5Version = '5.3.7.Final'
-    orm6Version = '6.0.0-SNAPSHOT'
+    orm6Version = '6.0.0.BENCHMARK'
 
     h2Version = '1.4.196'
 
     libraries = [
-            jmh:        "org.openjdk.jmh:jmh-core:${jmhVersion}",
+            jmh: "org.openjdk.jmh:jmh-core:${jmhVersion}",
 
             jpa: 'javax.persistence:javax.persistence-api:2.2',
 
@@ -26,5 +26,8 @@ ext {
             h2: "com.h2database:h2:${h2Version}",
 
             logging: 'org.jboss.logging:jboss-logging:3.3.2.Final',
+
+            log4j: 'log4j:log4j:1.2.17',
+
         ]
 }

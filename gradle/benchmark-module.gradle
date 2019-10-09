@@ -1,7 +1,7 @@
 
 apply from: rootProject.file( 'gradle/java-module.gradle' )
 
-apply plugin: "me.champeau.gradle.jmh"
+apply plugin: 'me.champeau.gradle.jmh'
 
 dependencies {
 	compile project( ':common' )
@@ -9,10 +9,14 @@ dependencies {
 	compile libraries.jpa
 
 	runtime libraries.h2
+	runtime libraries.log4j
 }
 
 jmh {
 	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
+
+	include = [ 'simplePathPredicateExecution']
+	jvmArgsAppend = [ '-XX:+UnlockDiagnosticVMOptions',  '-XX:+DebugNonSafepoints',  '-XX:+UnlockCommercialFeatures' ]
 
 	benchmarkMode = ['avgt']
 
@@ -23,9 +27,57 @@ jmh {
 	def formattedDate = new Date().format( 'yyyy-MM-dd-HHmmss' )
 
 	resultFormat = 'JSON'
-	resultsFile = project.file( "${buildDir}/reports/jmh/results_${formattedDate}.txt" )
+	resultsFile = project.file( "${buildDir}/reports/jmh/results_${formattedDate}.json" )
 
 	humanOutputFile = project.file( "${buildDir}/reports/jmh/human_${formattedDate}.txt" )
 }
 
-task benchmark( dependsOn: [tasks.jmh] )
+task benchmark( dependsOn: [tasks.jmh] ) {
+	description = "Alias for the JMH task"
+}
+
+ext {
+	initialNoTurboSetting = 0
+	initialRandomizerSetting = 0
+
+	runtime = Runtime.getRuntime();
+	// use of internal - https://github.com/gradle/gradle/issues/7735
+	os = org.gradle.internal.os.OperatingSystem.current()
+
+	if ( os.linux ) {
+		initialNoTurboSetting = determineInitialSetting( "/sys/devices/system/cpu/intel_pstate/no_turbo", runtime )
+		initialRandomizerSetting = determineInitialSetting( "/proc/sys/kernel/randomize_va_space", runtime )
+	}
+}
+
+tasks.jmh {
+	doFirst {
+		if ( os.linux ) {
+			runtime.exec( "sudo tuned-adm profile throughput-performance" );
+
+			runtime.exec( "sudo echo 1 > /sys/devices/system/cpu/intel_pstate/no_turbo" );
+
+			runtime.exec( "echo \"performance\" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor" );
+
+			runtime.exec( "sudo echo 0 > /proc/sys/kernel/randomize_va_space" );
+		}
+	}
+
+	doLast {
+		if ( os.linux ) {
+			runtime.exec( "sudo echo ${initialNoTurboSetting} > /sys/devices/system/cpu/intel_pstate/no_turbo" );
+
+			runtime.exec( "sudo echo ${initialRandomizerSetting} > /proc/sys/kernel/randomize_va_space" );
+		}
+	}
+}
+
+int determineInitialSetting(String settingFilePath, Runtime runtime) {
+	Process process = runtime.exec( "sudo cat " + settingFilePath )
+
+	process.outputStream
+	// todo : because we are using sudo, do we want to check whether sudo prompted for pw?
+	Reader reader = new InputStreamReader( process.getInputStream() )
+	def output = reader.readLine()
+	initialNoTurboSetting = output == null ? 0 : Integer.valueOf( output )
+}

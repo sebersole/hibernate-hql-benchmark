@@ -2,6 +2,11 @@ apply from: rootProject.file( 'gradle/benchmark-module.gradle' )
 
 sourceCompatibility = 1.8
 
+repositories {
+    // because I cannot do releases :(
+    mavenLocal()
+}
+
 dependencies {
     compile libraries.orm6
 }

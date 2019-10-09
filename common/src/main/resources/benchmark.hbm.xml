@@ -6,7 +6,7 @@
   ~ See the lgpl.txt file in the root directory or http://www.gnu.org/licenses/lgpl-2.1.html
   -->
 <!DOCTYPE hibernate-mapping SYSTEM "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd" >
-<hibernate-mapping package="org.hibernate.sebersole.benchmarks.poc.model" default-access="field">
+<hibernate-mapping package="org.hibernate.benchmarks.hql.model" default-access="field">
 
     <class name="Animal">
         <id name="id">
