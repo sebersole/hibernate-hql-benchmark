@@ -13,9 +13,10 @@ dependencies {
 }
 
 jmh {
-	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
+	// temporarily limit the tests executed
+	include = [ 'multiExecution']
 
-	include = [ 'simplePathPredicateExecution']
+	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
 	jvmArgsAppend = [ '-XX:+UnlockDiagnosticVMOptions',  '-XX:+DebugNonSafepoints',  '-XX:+UnlockCommercialFeatures' ]
 
 	benchmarkMode = ['avgt']

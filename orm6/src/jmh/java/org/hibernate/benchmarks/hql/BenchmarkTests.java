@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.hibernate.benchmarks.hql.model.Component;
 import org.hibernate.benchmarks.hql.model.CompositionEntity;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -53,6 +54,13 @@ public class BenchmarkTests {
 				// ignore this here
 			}
 		}
+	}
+
+	@Benchmark
+	@BenchmarkMode( Mode.AverageTime )
+	@OutputTimeUnit(TimeUnit.MICROSECONDS)
+	public void multiExecution(BenchmarkState state) {
+		state.performMultiExecutions();
 	}
 
 	@Benchmark
@@ -119,19 +127,19 @@ public class BenchmarkTests {
 		state.setUp();
 
 		try {
-			tests.simplePathPredicateExecution( state );
-			tests.simplePathPredicateExecution( state );
-			tests.simplePathPredicateExecution( state );
-			tests.simplePathPredicateExecution( state );
-			tests.simplePathPredicateExecution( state );
-			tests.simplePathPredicateExecution( state );
-			tests.simplePathPredicateExecution( state );
-			tests.simplePathPredicateExecution( state );
-			tests.simplePathPredicateExecution( state );
-			tests.simplePathPredicateExecution( state );
-			tests.simplePathPredicateExecution( state );
-			tests.simplePathPredicateExecution( state );
-			tests.simplePathPredicateExecution( state );
+			tests.multiExecution( state );
+			tests.multiExecution( state );
+			tests.multiExecution( state );
+			tests.multiExecution( state );
+			tests.multiExecution( state );
+			tests.multiExecution( state );
+			tests.multiExecution( state );
+			tests.multiExecution( state );
+			tests.multiExecution( state );
+			tests.multiExecution( state );
+			tests.multiExecution( state );
+			tests.multiExecution( state );
+			tests.multiExecution( state );
 		}
 		finally {
 			state.tearDown();

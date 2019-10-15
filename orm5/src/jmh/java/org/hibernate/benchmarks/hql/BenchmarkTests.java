@@ -13,6 +13,7 @@ import javax.persistence.TypedQuery;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.benchmarks.hql.model.Component;
 import org.hibernate.benchmarks.hql.model.CompositionEntity;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 
@@ -71,20 +72,6 @@ public class BenchmarkTests {
 	@Benchmark
 	@BenchmarkMode( Mode.AverageTime )
 	@OutputTimeUnit(TimeUnit.MICROSECONDS)
-	public void simplePathPredicateExecution(BenchmarkState state) {
-		final EntityManager entityManager = state.getEntityManagerFactory().createEntityManager();
-		final TypedQuery<CompositionEntity> query = entityManager.createQuery(
-				"select e from CompositionEntity e where e.description = :description",
-				CompositionEntity.class
-		);
-		final CompositionEntity result = query.setParameter( "description", "first" ).getSingleResult();
-		assert result != null;
-		assert "first".equals( result.getDescription() );
-	}
-
-	@Benchmark
-	@BenchmarkMode( Mode.AverageTime )
-	@OutputTimeUnit(TimeUnit.MICROSECONDS)
 	public Object nestedPathPredicate(BenchmarkState state) {
 		return getSemanticModel(
 				"select a from Animal a where a.mother.mother.description = :description",
@@ -102,45 +89,30 @@ public class BenchmarkTests {
 		);
 	}
 
+	@Benchmark
+	@BenchmarkMode( Mode.AverageTime )
+	@OutputTimeUnit(TimeUnit.MICROSECONDS)
+	public void simplePathPredicateExecution(BenchmarkState state) {
+		final EntityManager entityManager = state.getEntityManagerFactory().createEntityManager();
+		final TypedQuery<CompositionEntity> query = entityManager.createQuery(
+				"select e from CompositionEntity e where e.description = :description",
+				CompositionEntity.class
+		);
+		final CompositionEntity result = query.setParameter( "description", "first" ).getSingleResult();
+		assert result != null;
+		assert "first".equals( result.getDescription() );
+	}
+
+	@Benchmark
+	@BenchmarkMode( Mode.AverageTime )
+	@OutputTimeUnit(TimeUnit.MICROSECONDS)
+	public void multiExecution(BenchmarkState state) {
+		state.performMultiExecutions();
+	}
+
 	private Object getSemanticModel(String query, BenchmarkState benchmarkState) {
 		return benchmarkState.getHqlSemanticTreeBuilder().buildSemanticModel( query );
 	}
-
-	private void inSession(BenchmarkState state, Consumer<Session> action) {
-		try (Session session = state.getEntityManagerFactory().unwrap( SessionFactoryImplementor.class ).openSession()) {
-			action.accept( session );
-		}
-	}
-
-	private void inTransaction(BenchmarkState state, Consumer<Session> action) {
-		inSession(
-				state,
-				session -> {
-					Transaction txn = session.beginTransaction();
-
-					try {
-						action.accept( session );
-						if ( !txn.isActive() ) {
-							throw new RuntimeException( "Execution of action caused managed transaction to be completed" );
-						}
-					}
-					catch (RuntimeException var6) {
-						if (txn.isActive()) {
-							try {
-								txn.rollback();
-							}
-							catch (Exception var5) {
-							}
-						}
-
-						throw var6;
-					}
-
-					txn.commit();
-				}
-		);
-	}
-
 
 	public static void main(String... args) {
 		final BenchmarkTests tests = new BenchmarkTests();

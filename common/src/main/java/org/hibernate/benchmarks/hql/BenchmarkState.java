@@ -183,4 +183,49 @@ public class BenchmarkState {
 	public EntityManagerFactory getEntityManagerFactory() {
 		return emf;
 	}
+
+	public void performMultiExecutions() {
+		final EntityManager entityManager = getEntityManagerFactory().createEntityManager();
+
+		try {
+			final TypedQuery<CompositionEntity> query1 = entityManager.createQuery(
+					"select e from CompositionEntity e where e.description = :description",
+					CompositionEntity.class
+			);
+
+			final CompositionEntity result1 = query1.setParameter( "description", "first" ).getSingleResult();
+			assert result1 != null;
+			assert "first".equals( result1.getDescription() );
+
+
+			final TypedQuery<String> query2 = entityManager.createQuery(
+					"select e.description from CompositionEntity e where e.description = :description",
+					String.class
+			);
+
+			final String result2 = query2.setParameter( "description", "first" ).getSingleResult();
+			assert result2 != null;
+			assert "first".equals( result2 );
+
+
+			final TypedQuery<Component> query3 = entityManager.createQuery(
+					"select e.component from CompositionEntity e where e.description = :description",
+					Component.class
+			);
+
+			final Component result3 = query3.setParameter( "description", "first" ).getSingleResult();
+			assert result3 != null;
+			assert "root - 1".equals( result3.getText() );
+		}
+		finally {
+			// in this block we know creation of the EM succeeded, so close it
+			try {
+				entityManager.close();
+			}
+			catch (Exception e) {
+				// ignore this here
+			}
+		}
+
+	}
 }
