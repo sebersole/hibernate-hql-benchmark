@@ -66,12 +66,13 @@ wrapper {
 
             def realWrapperBatRelativePath =  sub.relativePath( realWrapperBatScriptFile )
             def wrapperBatLinkFile = new File( sub.projectDir, GRADLEW_BAT )
+
             if ( ! wrapperBatLinkFile.exists() ) {
                 wrapperBatLinkFile.createNewFile()
-                wrapperBatLinkFile.text = 'call ' + realWrapperBatRelativePath
-                wrapperBatLinkFile.executable = true
             }
 
+            wrapperBatLinkFile.text = "call \"${realWrapperBatRelativePath}\""
+            wrapperBatLinkFile.executable = true
         }
     }
 }
