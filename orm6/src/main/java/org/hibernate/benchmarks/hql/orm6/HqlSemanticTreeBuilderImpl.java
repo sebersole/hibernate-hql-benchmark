@@ -6,11 +6,8 @@
  */
 package org.hibernate.benchmarks.hql.orm6;
 
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.query.hql.internal.HqlParser;
-import org.hibernate.query.hql.internal.SemanticQueryBuilder;
-import org.hibernate.query.sqm.internal.SqmCreationOptionsStandard;
 import org.hibernate.benchmarks.hql.HqlSemanticTreeBuilder;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 
 /**
  * @author John O`Hara
@@ -27,11 +24,6 @@ public class HqlSemanticTreeBuilderImpl implements HqlSemanticTreeBuilder {
 
 	@Override
 	public Object buildSemanticModel(String hqlString) {
-		final HqlParser hqlParser = org.hibernate.query.hql.internal.HqlParseTreeBuilder.INSTANCE.parseHql( hqlString );
-		return SemanticQueryBuilder.buildSemanticModel(
-				hqlParser.statement(),
-				new SqmCreationOptionsStandard( sessionFactory ),
-				sessionFactory
-		);
+		return sessionFactory.getQueryEngine().getHqlTranslator().interpret( hqlString );
 	}
 }

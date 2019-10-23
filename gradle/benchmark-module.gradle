@@ -12,6 +12,7 @@ dependencies {
 	runtime libraries.log4j
 }
 
+// JMH for `avgt` profiling
 jmh {
 	// temporarily limit the tests executed
 	include = [ 'multiExecution']
@@ -33,6 +34,30 @@ jmh {
 	humanOutputFile = project.file( "${buildDir}/reports/jmh/human_${formattedDate}.txt" )
 }
 
+
+// JMH for `thrpt` profiling
+//jmh {
+//	// temporarily limit the tests executed
+//	include = [ 'multiExecution']
+//
+//	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
+//	jvmArgsAppend = [ '-XX:+UnlockDiagnosticVMOptions',  '-XX:+DebugNonSafepoints',  '-XX:+UnlockCommercialFeatures' ]
+//
+//	benchmarkMode = ['thrpt']
+//
+//	threads = 10
+////	iterations = 20
+////	fork = 2 //default 10
+////	warmupIterations = 20 // Number of warmup iterations to do.
+//
+//	def formattedDate = new Date().format( 'yyyy-MM-dd-HHmmss' )
+//
+//	resultFormat = 'JSON'
+//	resultsFile = project.file( "${buildDir}/reports/jmh/results_${formattedDate}.json" )
+//
+//	humanOutputFile = project.file( "${buildDir}/reports/jmh/human_${formattedDate}.txt" )
+//}
+
 task benchmark( dependsOn: [tasks.jmh] ) {
 	description = "Alias for the JMH task"
 }
@@ -51,24 +76,26 @@ ext {
 	}
 }
 
-tasks.jmh {
-	doFirst {
-		if ( os.linux ) {
-			runtime.exec( "sudo tuned-adm profile throughput-performance" );
+if ( project.hasProperty( "adjustOS" ) ) {
+	tasks.jmh {
+		doFirst {
+			if ( os.linux ) {
+				runtime.exec( "sudo tuned-adm profile throughput-performance" );
 
-			runtime.exec( "sudo echo 1 > /sys/devices/system/cpu/intel_pstate/no_turbo" );
+				runtime.exec( "sudo echo 1 > /sys/devices/system/cpu/intel_pstate/no_turbo" );
 
-			runtime.exec( "echo \"performance\" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor" );
+				runtime.exec( "echo \"performance\" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor" );
 
-			runtime.exec( "sudo echo 0 > /proc/sys/kernel/randomize_va_space" );
+				runtime.exec( "sudo echo 0 > /proc/sys/kernel/randomize_va_space" );
+			}
 		}
-	}
 
-	doLast {
-		if ( os.linux ) {
-			runtime.exec( "sudo echo ${initialNoTurboSetting} > /sys/devices/system/cpu/intel_pstate/no_turbo" );
+		doLast {
+			if ( os.linux ) {
+				runtime.exec( "sudo echo ${initialNoTurboSetting} > /sys/devices/system/cpu/intel_pstate/no_turbo" );
 
-			runtime.exec( "sudo echo ${initialRandomizerSetting} > /proc/sys/kernel/randomize_va_space" );
+				runtime.exec( "sudo echo ${initialRandomizerSetting} > /proc/sys/kernel/randomize_va_space" );
+			}
 		}
 	}
 }
