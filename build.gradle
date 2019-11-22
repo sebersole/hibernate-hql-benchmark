@@ -1,4 +1,5 @@
 import java.nio.file.Files
+import groovy.json.JsonSlurper
 
 buildscript {
     repositories {
@@ -19,7 +20,12 @@ task jmh {
     // unified report
 
     doLast {
-        getLogger().lifecycle( "Generating shared JMH result report" );
+        getLogger().lifecycle( "Generating shared JMH result report" )
+//
+//        def jsonSlurper = new JsonSlurper()
+//
+//        final Map<BenchmarkKey,BenchmarkScore> orm6Results = parseJson( project( ":orm6" ).jmhReportJsonFile as File )
+//        final Map<BenchmarkKey,BenchmarkScore> orm5Results = parseJson( project( ":orm5" ).jmhReportJsonFile as File )
 
 		// todo : generate the report :)
     }
@@ -58,7 +64,7 @@ wrapper {
             def symlinkPath = symLinkRef.toPath()
 
             Files.deleteIfExists( symlinkPath )
-            Files.createSymbolicLink( symlinkPath, sub.file( realWrapperRelativePath ).toPath() );
+            Files.createSymbolicLink( symlinkPath, sub.file( realWrapperRelativePath ).toPath() )
 
 
             // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,4 +81,63 @@ wrapper {
             wrapperBatLinkFile.executable = true
         }
     }
+
 }
+
+//Map<BenchmarkKey, BenchmarkScore> parseJson(File jsonFile) {
+//    def results = new HashMap<BenchmarkKey, BenchmarkScore>()
+//    def jsonData = new JsonSlurper().parse( jsonFile );
+//    jsonData.each {
+//        benchmark -> results.put(
+//                new BenchmarkKey( benchmark.mode, benchmark.benchmark ),
+//                new BenchmarkScore( benchmark.primaryMetric.score, benchmark.primaryMetric.scoreError)
+//        )
+//    }
+//}
+//
+//class BenchmarkKey {
+//    String mode;
+//    String name;
+//
+//    BenchmarkKey(String mode, String name) {
+//        this.mode = mode
+//        this.name = name
+//    }
+//
+//    boolean equals(o) {
+//        if ( this.is( o ) ) {
+//            return true
+//        }
+//        if ( getClass() != o.class ) {
+//            return false
+//        }
+//
+//        BenchmarkKey that = (BenchmarkKey) o
+//
+//        if ( mode != that.mode ) {
+//            return false
+//        }
+//        if ( name != that.name ) {
+//            return false
+//        }
+//
+//        return true
+//    }
+//
+//    int hashCode() {
+//        int result
+//        result = mode.hashCode()
+//        result = 31 * result + name.hashCode()
+//        return result
+//    }
+//}
+//
+//class BenchmarkScore {
+//    BigDecimal score;
+//    BigDecimal confidence;
+//
+//    BenchmarkScore(BigDecimal score, BigDecimal confidence) {
+//        this.score = score
+//        this.confidence = confidence
+//    }
+//}

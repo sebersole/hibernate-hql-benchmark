@@ -15,11 +15,13 @@ dependencies {
 ext {
 	def formattedDate = new Date().format( 'yyyy-MM-dd-HH-mm-ss' )
 	jmhReportDir = project.file( "${buildDir}/reports/jmh/${formattedDate}" )
+	jmhReportHumanFile = project.file( "${jmhReportDir}/human.txt" )
+	jmhReportJsonFile = project.file( "${jmhReportDir}/results.json" )
 
 	initialNoTurboSetting = 0
 	initialRandomizerSetting = 0
 
-	runtime = Runtime.getRuntime();
+	runtime = Runtime.getRuntime()
 	// use of internal - https://github.com/gradle/gradle/issues/7735
 	os = org.gradle.internal.os.OperatingSystem.current()
 
@@ -27,9 +29,31 @@ ext {
 		initialNoTurboSetting = determineInitialSetting( "/sys/devices/system/cpu/intel_pstate/no_turbo", runtime )
 		initialRandomizerSetting = determineInitialSetting( "/proc/sys/kernel/randomize_va_space", runtime )
 	}
+
 }
 
 // JMH for `avgt` profiling
+jmh {
+//	// temporarily limit the tests executed
+//	include = [ 'multiExecution']
+//
+//	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
+//	jvmArgsAppend = [ '-XX:+UnlockDiagnosticVMOptions',  '-XX:+DebugNonSafepoints',  '-XX:+UnlockCommercialFeatures' ]
+//
+//	benchmarkMode = ['avgt']
+//
+//	iterations = 20 //default 10
+//	fork = 2 //default 10
+//	warmupIterations = 20 // Number of warmup iterations to do.
+//
+//	humanOutputFile = jmhReportHumanFile
+//
+//	resultsFile = jmhReportJsonFile
+//	resultFormat = 'JSON'
+}
+
+
+// JMH for `thrpt` profiling
 jmh {
 	// temporarily limit the tests executed
 	include = [ 'multiExecution']
@@ -37,41 +61,18 @@ jmh {
 	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
 	jvmArgsAppend = [ '-XX:+UnlockDiagnosticVMOptions',  '-XX:+DebugNonSafepoints',  '-XX:+UnlockCommercialFeatures' ]
 
-	benchmarkMode = ['avgt']
+	benchmarkMode = ['thrpt']
 
-	iterations = 20 //default 10
-	fork = 2 //default 10
-	warmupIterations = 20 // Number of warmup iterations to do.
+	threads = 10
+//	iterations = 20
+//	fork = 2 //default 10
+//	warmupIterations = 20 // Number of warmup iterations to do.
 
-	humanOutputFile = project.file( "${jmhReportDir}//human.txt" )
+	humanOutputFile = jmhReportHumanFile
 
-	resultsFile = project.file( "${jmhReportDir}/results.json" )
+	resultsFile = jmhReportJsonFile
 	resultFormat = 'JSON'
 }
-
-
-// JMH for `thrpt` profiling
-//jmh {
-//	// temporarily limit the tests executed
-//	include = [ 'multiExecution']
-//
-//	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
-//	jvmArgsAppend = [ '-XX:+UnlockDiagnosticVMOptions',  '-XX:+DebugNonSafepoints',  '-XX:+UnlockCommercialFeatures' ]
-//
-//	benchmarkMode = ['thrpt']
-//
-//	threads = 10
-////	iterations = 20
-////	fork = 2 //default 10
-////	warmupIterations = 20 // Number of warmup iterations to do.
-//
-//	def formattedDate = new Date().format( 'yyyy-MM-dd-HHmmss' )
-//
-//	resultFormat = 'JSON'
-//	resultsFile = project.file( "${buildDir}/reports/jmh/results_${formattedDate}.json" )
-//
-//	humanOutputFile = project.file( "${buildDir}/reports/jmh/human_${formattedDate}.txt" )
-//}
 
 task benchmark( dependsOn: [tasks.jmh] ) {
 	description = "Alias for the JMH task"
@@ -87,19 +88,19 @@ tasks.jmh {
 		logger.lifecycle( "Applying OS adjustments" )
 
 		doFirst {
-			runtime.exec( "sudo tuned-adm profile throughput-performance" );
+			runtime.exec( "sudo tuned-adm profile throughput-performance" )
 
-			runtime.exec( "sudo echo 1 > /sys/devices/system/cpu/intel_pstate/no_turbo" );
+			runtime.exec( "sudo echo 1 > /sys/devices/system/cpu/intel_pstate/no_turbo" )
 
-			runtime.exec( "echo \"performance\" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor" );
+			runtime.exec( "echo \"performance\" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor" )
 
-			runtime.exec( "sudo echo 0 > /proc/sys/kernel/randomize_va_space" );
+			runtime.exec( "sudo echo 0 > /proc/sys/kernel/randomize_va_space" )
 		}
 
 		doLast {
-			runtime.exec( "sudo echo ${initialNoTurboSetting} > /sys/devices/system/cpu/intel_pstate/no_turbo" );
+			runtime.exec( "sudo echo ${initialNoTurboSetting} > /sys/devices/system/cpu/intel_pstate/no_turbo" )
 
-			runtime.exec( "sudo echo ${initialRandomizerSetting} > /proc/sys/kernel/randomize_va_space" );
+			runtime.exec( "sudo echo ${initialRandomizerSetting} > /proc/sys/kernel/randomize_va_space" )
 		}
 	}
 }

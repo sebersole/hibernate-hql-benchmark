@@ -18,12 +18,13 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 public class HqlSemanticTreeBuilderImpl implements HqlSemanticTreeBuilder {
 	private final SessionFactoryImplementor sessionFactory;
 
+	@SuppressWarnings("WeakerAccess")
 	public HqlSemanticTreeBuilderImpl(SessionFactoryImplementor sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 
 	@Override
 	public Object buildSemanticModel(String hqlString) {
-		return sessionFactory.getQueryEngine().getHqlTranslator().interpret( hqlString );
+		return sessionFactory.getQueryEngine().getHqlTranslator().translate( hqlString );
 	}
 }
