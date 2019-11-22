@@ -33,10 +33,7 @@ ext {
 }
 
 // JMH for `avgt` profiling
-jmh {
-//	// temporarily limit the tests executed
-//	include = [ 'multiExecution']
-//
+//jmh {
 //	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
 //	jvmArgsAppend = [ '-XX:+UnlockDiagnosticVMOptions',  '-XX:+DebugNonSafepoints',  '-XX:+UnlockCommercialFeatures' ]
 //
@@ -50,14 +47,11 @@ jmh {
 //
 //	resultsFile = jmhReportJsonFile
 //	resultFormat = 'JSON'
-}
+//}
 
 
 // JMH for `thrpt` profiling
 jmh {
-	// temporarily limit the tests executed
-	include = [ 'multiExecution']
-
 	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
 	jvmArgsAppend = [ '-XX:+UnlockDiagnosticVMOptions',  '-XX:+DebugNonSafepoints',  '-XX:+UnlockCommercialFeatures' ]
 
