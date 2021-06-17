@@ -26,8 +26,8 @@ apply from: rootProject.file( 'gradle/libraries.gradle' )
 sourceCompatibility = 1.8
 
 dependencies {
-	compile 'org.openjdk.jmh:jmh-core:1.21'
-	compile libraries.logging
+	implementation 'org.openjdk.jmh:jmh-core:1.21'
+	implementation libraries.logging
 }
 
 task compile {

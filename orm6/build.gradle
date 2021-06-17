@@ -8,5 +8,5 @@ repositories {
 }
 
 dependencies {
-    compile libraries.orm6
+    implementation libraries.orm6
 }

@@ -11,7 +11,15 @@ ext {
     jmhVersion = '1.21'
 
     orm5Version = '5.3.7.Final'
-    orm6Version = '6.0.0-SNAPSHOT'
+    orm6Version = '6.0.0.BENCHMARK'
+
+    if ( project.hasProperty( 'orm6_version' ) ) {
+        orm6Version = project.property( 'orm6_version' )
+    }
+
+    if ( System.getProperty('orm6_version' ) != null ) {
+        orm6Version = System.getProperty( 'orm6_version' )
+    }
 
     h2Version = '1.4.196'
 

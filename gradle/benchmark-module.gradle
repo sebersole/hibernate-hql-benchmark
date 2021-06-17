@@ -4,12 +4,12 @@ apply from: rootProject.file( 'gradle/java-module.gradle' )
 apply plugin: 'me.champeau.gradle.jmh'
 
 dependencies {
-	compile project( ':common' )
+	implementation project( ':common' )
 
-	compile libraries.jpa
+	implementation libraries.jpa
 
-	runtime libraries.h2
-	runtime libraries.log4j
+	runtimeOnly libraries.h2
+	runtimeOnly libraries.log4j
 }
 
 ext {
@@ -33,40 +33,41 @@ ext {
 }
 
 // JMH for `avgt` profiling
-//jmh {
-//	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
-//	jvmArgsAppend = [ '-XX:+UnlockDiagnosticVMOptions',  '-XX:+DebugNonSafepoints',  '-XX:+UnlockCommercialFeatures' ]
-//
-//	benchmarkMode = ['avgt']
-//
-//	iterations = 20 //default 10
-//	fork = 2 //default 10
-//	warmupIterations = 20 // Number of warmup iterations to do.
-//
-//	humanOutputFile = jmhReportHumanFile
-//
-//	resultsFile = jmhReportJsonFile
-//	resultFormat = 'JSON'
-//}
-
-
-// JMH for `thrpt` profiling
 jmh {
 	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
-	jvmArgsAppend = [ '-XX:+UnlockDiagnosticVMOptions',  '-XX:+DebugNonSafepoints',  '-XX:+UnlockCommercialFeatures' ]
+//	jvmArgsAppend = [ '-XX:+UnlockDiagnosticVMOptions',  '-XX:+DebugNonSafepoints',  '-XX:+UnlockCommercialFeatures' ]
 
-	benchmarkMode = ['thrpt']
+	benchmarkMode = ['avgt']
 
-	threads = 10
-//	iterations = 20
-//	fork = 2 //default 10
-//	warmupIterations = 20 // Number of warmup iterations to do.
+	iterations = 20 //default 10
+	fork = 2 //default 10
+	warmupIterations = 20 // Number of warmup iterations to do.
 
 	humanOutputFile = jmhReportHumanFile
 
 	resultsFile = jmhReportJsonFile
 	resultFormat = 'JSON'
 }
+
+
+// JMH for `thrpt` profiling
+//jmh {
+//	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
+//
+//	jvmArgsAppend = [ '-XX:+UnlockDiagnosticVMOptions',  '-XX:+DebugNonSafepoints',  '-XX:+UnlockCommercialFeatures' ]
+//
+//	benchmarkMode = ['thrpt']
+//
+//	threads = 10
+////	iterations = 20
+////	fork = 2 //default 10
+////	warmupIterations = 20 // Number of warmup iterations to do.
+//
+//	humanOutputFile = jmhReportHumanFile
+//
+//	resultsFile = jmhReportJsonFile
+//	resultFormat = 'JSON'
+//}
 
 task benchmark( dependsOn: [tasks.jmh] ) {
 	description = "Alias for the JMH task"

@@ -11,5 +11,5 @@ repositories {
 }
 
 dependencies {
-    compile libraries.jpa
+    implementation libraries.jpa
 }
