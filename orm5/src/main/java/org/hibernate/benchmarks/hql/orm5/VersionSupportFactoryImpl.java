@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 
-import org.hibernate.benchmarks.hql.HibernateVersionSupport;
+import org.hibernate.benchmarks.hql.VersionSupport;
 import org.hibernate.benchmarks.hql.VersionSupportFactory;
 
 /**
@@ -18,7 +18,7 @@ import org.hibernate.benchmarks.hql.VersionSupportFactory;
  */
 public class VersionSupportFactoryImpl implements VersionSupportFactory {
 	@Override
-	public HibernateVersionSupport buildHibernateVersionSupport() {
+	public VersionSupport buildVersionSupport() {
 		return new VersionSupportImpl();
 	}
 

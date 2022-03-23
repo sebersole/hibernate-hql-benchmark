@@ -9,12 +9,20 @@ dependencies {
 	implementation libraries.jpa
 
 	runtimeOnly libraries.h2
-	runtimeOnly libraries.log4j
 }
 
 ext {
-	def formattedDate = new Date().format( 'yyyy-MM-dd-HH-mm-ss' )
-	jmhReportDir = project.file( "${buildDir}/reports/jmh/${formattedDate}" )
+	if ( project.hasProperty( 'relativeJmhReportDir' ) ) {
+		jmhReportDir = project.file( "${buildDir}/${project.hasProperty( 'relativeJmhReportDir' )}" )
+	}
+	else if ( System.getProperty( 'relativeJmhReportDir' ) != null ) {
+		jmhReportDir = project.file( "${buildDir}/${System.getProperty( 'relativeJmhReportDir' )}" )
+	}
+	else {
+		def formattedDate = new Date().format( 'yyyy-MM-dd-HH-mm-ss' )
+		jmhReportDir = project.file( "${buildDir}/reports/jmh/${formattedDate}" )
+	}
+
 	jmhReportHumanFile = project.file( "${jmhReportDir}/human.txt" )
 	jmhReportJsonFile = project.file( "${jmhReportDir}/results.json" )
 
@@ -29,7 +37,6 @@ ext {
 		initialNoTurboSetting = determineInitialSetting( "/sys/devices/system/cpu/intel_pstate/no_turbo", runtime )
 		initialRandomizerSetting = determineInitialSetting( "/proc/sys/kernel/randomize_va_space", runtime )
 	}
-
 }
 
 // JMH for `avgt` profiling

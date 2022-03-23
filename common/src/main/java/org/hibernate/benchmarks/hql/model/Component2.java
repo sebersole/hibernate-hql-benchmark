@@ -6,12 +6,11 @@
  */
 package org.hibernate.benchmarks.hql.model;
 
-import javax.persistence.Embeddable;
-
 /**
  * @author Steve Ebersole
  */
-@Embeddable
+@jakarta.persistence.Embeddable
+@javax.persistence.Embeddable
 public class Component2 {
 	private String attribute1;
 	private String attribute2;

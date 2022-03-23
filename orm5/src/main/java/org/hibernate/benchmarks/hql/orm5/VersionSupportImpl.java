@@ -6,23 +6,22 @@
  */
 package org.hibernate.benchmarks.hql.orm5;
 
-import javax.persistence.EntityManagerFactory;
-
-import org.hibernate.benchmarks.hql.HibernateVersionSupport;
 import org.hibernate.benchmarks.hql.HqlSemanticTreeBuilder;
+import org.hibernate.benchmarks.hql.PersistenceContext;
+import org.hibernate.benchmarks.hql.VersionSupport;
+import org.hibernate.benchmarks.hql.model.Component;
+import org.hibernate.benchmarks.hql.model.CompositionEntity;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.benchmarks.hql.model.Component;
-import org.hibernate.benchmarks.hql.model.CompositionEntity;
 
 /**
  * @author Steve Ebersole
  */
-public class VersionSupportImpl implements HibernateVersionSupport {
-	private StandardServiceRegistry serviceRegistry;
-	private SessionFactoryImplementor sessionFactory;
+public class VersionSupportImpl implements VersionSupport {
+	private final StandardServiceRegistry serviceRegistry;
+	private final SessionFactoryImplementor sessionFactory;
 
 	public VersionSupportImpl() {
 		serviceRegistry = new StandardServiceRegistryBuilder().build();
@@ -38,6 +37,11 @@ public class VersionSupportImpl implements HibernateVersionSupport {
 	@Override
 	public HqlSemanticTreeBuilder getHqlSemanticInterpreter() {
 		return new HqlSemanticTreeBuilderImpl( sessionFactory );
+	}
+
+	@Override
+	public PersistenceContext createPersistenceContext() {
+		return new PersistenceContextImpl( sessionFactory );
 	}
 
 	@Override
@@ -57,10 +61,5 @@ public class VersionSupportImpl implements HibernateVersionSupport {
 			catch (Exception ignore) {
 			}
 		}
-	}
-
-	@Override
-	public EntityManagerFactory getEntityManagerFactory() {
-		return sessionFactory;
 	}
 }

@@ -6,23 +6,17 @@
  */
 package org.hibernate.benchmarks.hql;
 
-import javax.persistence.EntityManagerFactory;
-
 /**
  * The main abstraction between different versions of Hibernate for the purpose of this benchmark
  */
-public interface HibernateVersionSupport {
+public interface VersionSupport {
 	/**
 	 * Get a delegate for performing the second step of HQL interpretation,
 	 * which is to perform initial "semantic interpretation" of the parse tree
 	 */
 	HqlSemanticTreeBuilder getHqlSemanticInterpreter();
 
-	/**
-	 * Get a usable JPA EntityManagerFactory.  Used to perform the execution
-	 * "full stack" tests
-	 */
-	EntityManagerFactory getEntityManagerFactory();
+	PersistenceContext createPersistenceContext();
 
 	/**
 	 * Close the SessionFactory, etc

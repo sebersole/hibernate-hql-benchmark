@@ -6,7 +6,7 @@
  */
 package org.hibernate.benchmarks.hql.orm6;
 
-import org.hibernate.benchmarks.hql.HibernateVersionSupport;
+import org.hibernate.benchmarks.hql.VersionSupport;
 import org.hibernate.benchmarks.hql.VersionSupportFactory;
 
 /**
@@ -14,7 +14,7 @@ import org.hibernate.benchmarks.hql.VersionSupportFactory;
  */
 public class VersionSupportFactoryImpl implements VersionSupportFactory {
 	@Override
-	public HibernateVersionSupport buildHibernateVersionSupport() {
+	public VersionSupport buildVersionSupport() {
 		return new VersionSupportImpl();
 	}
 }

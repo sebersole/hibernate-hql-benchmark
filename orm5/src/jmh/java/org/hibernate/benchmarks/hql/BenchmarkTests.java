@@ -7,15 +7,8 @@
 package org.hibernate.benchmarks.hql;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.benchmarks.hql.model.Component;
 import org.hibernate.benchmarks.hql.model.CompositionEntity;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -93,14 +86,17 @@ public class BenchmarkTests {
 	@BenchmarkMode( Mode.AverageTime )
 	@OutputTimeUnit(TimeUnit.MICROSECONDS)
 	public void simplePathPredicateExecution(BenchmarkState state) {
-		final EntityManager entityManager = state.getEntityManagerFactory().createEntityManager();
-		final TypedQuery<CompositionEntity> query = entityManager.createQuery(
-				"select e from CompositionEntity e where e.description = :description",
-				CompositionEntity.class
-		);
-		final CompositionEntity result = query.setParameter( "description", "first" ).getSingleResult();
-		assert result != null;
-		assert "first".equals( result.getDescription() );
+
+		try ( PersistenceContext pc = state.getPersistenceContextAccess().get() ) {
+			final QueryProxy<CompositionEntity> query = pc.createQuery(
+					"select e from CompositionEntity e where e.description = :description",
+					CompositionEntity.class
+			);
+
+			final CompositionEntity result = query.setParameter( "description", "first" ).getSingleResult();
+			assert result != null;
+			assert "first".equals( result.getDescription() );
+		}
 	}
 
 	@Benchmark

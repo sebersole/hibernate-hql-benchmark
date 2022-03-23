@@ -9,11 +9,7 @@ package org.hibernate.benchmarks.hql;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.TypedQuery;
+import java.util.function.Supplier;
 
 import org.hibernate.benchmarks.hql.model.Component;
 import org.hibernate.benchmarks.hql.model.Component2;
@@ -29,18 +25,23 @@ import org.openjdk.jmh.annotations.TearDown;
  */
 @State(Scope.Benchmark)
 public class BenchmarkState {
-
-	private HibernateVersionSupport versionSupport;
-
+	private VersionSupport versionSupport;
 	private HqlSemanticTreeBuilder hqlSemanticTreeBuilder;
-	private EntityManagerFactory emf;
+
+	public HqlSemanticTreeBuilder getHqlSemanticTreeBuilder() {
+		return hqlSemanticTreeBuilder;
+	}
+
+	public Supplier<PersistenceContext> getPersistenceContextAccess() {
+		return versionSupport::createPersistenceContext;
+	}
 
 	@Setup
 	public void setUp() {
 		try {
-			final ServiceLoader<VersionSupportFactory> discoveredImpls = ServiceLoader.load( VersionSupportFactory.class );
+			final ServiceLoader<VersionSupportFactory> discoveredFactories = ServiceLoader.load( VersionSupportFactory.class );
 
-			final Iterator<VersionSupportFactory> implItr = discoveredImpls.iterator();
+			final Iterator<VersionSupportFactory> implItr = discoveredFactories.iterator();
 
 			if ( ! implItr.hasNext() ) {
 				throw new RuntimeException( "Could not locate VersionSupportFactory service" );
@@ -52,10 +53,9 @@ public class BenchmarkState {
 				throw new RuntimeException( "Multiple VersionSupportFactory service impls found" );
 			}
 
-			versionSupport = factory.buildHibernateVersionSupport();
+			versionSupport = factory.buildVersionSupport();
 
 			hqlSemanticTreeBuilder = versionSupport.getHqlSemanticInterpreter();
-			emf = versionSupport.getEntityManagerFactory();
 
 			prepareExecutionData();
 		}
@@ -89,44 +89,31 @@ public class BenchmarkState {
 		);
 	}
 
-	private void inTransaction(Consumer<EntityManager> action) {
-		inEntityManager(
-				em -> {
-					EntityTransaction txn = em.getTransaction();
-					txn.begin();
+	private void inTransaction(Consumer<PersistenceContext> action) {
+		try ( final PersistenceContext pc = versionSupport.createPersistenceContext() ) {
+			final PersistenceContext.Transaction txn = pc.getTransaction();
+			txn.begin();
 
-					try {
-						action.accept( em );
+			try {
+				action.accept( pc );
 
-						if ( !txn.isActive() ) {
-							throw new RuntimeException( "Execution of action caused managed transaction to be completed" );
-						}
-					}
-					catch (RuntimeException e) {
-						if (txn.isActive()) {
-							try {
-								txn.rollback();
-							}
-							catch (Exception ignore) {
-							}
-						}
-
-						throw e;
-					}
-
-					txn.commit();
+				if ( !txn.isActive() ) {
+					throw new RuntimeException( "Execution of action caused managed transaction to be completed" );
 				}
-		);
-	}
+			}
+			catch (RuntimeException e) {
+				if (txn.isActive()) {
+					try {
+						txn.rollback();
+					}
+					catch (Exception ignore) {
+					}
+				}
 
-	private void inEntityManager(Consumer<EntityManager> action) {
-		final EntityManager entityManager = getEntityManagerFactory().createEntityManager();
+				throw e;
+			}
 
-		try {
-			action.accept( entityManager );
-		}
-		finally {
-			entityManager.close();
+			txn.commit();
 		}
 	}
 
@@ -149,46 +136,26 @@ public class BenchmarkState {
 			System.out.println( "Error releasing VersionSupport" );
 			e.printStackTrace();
 		}
-
-		try {
-			if ( emf != null ) {
-				emf.close();
-			}
-		}
-		catch (Throwable e) {
-			System.out.println( "Error releasing EntityManagerFactory" );
-			e.printStackTrace();
-		}
 	}
 
 	private void cleanUpExecutionData() {
 		inTransaction(
 				em -> {
-					final TypedQuery<CompositionEntity> query = em.createQuery(
+					final QueryProxy<CompositionEntity> query = em.createQuery(
 							"select e from CompositionEntity e",
 							CompositionEntity.class
 					);
 
-					for ( CompositionEntity entity : query.getResultList() ) {
+					for ( CompositionEntity entity : query.getResults() ) {
 						em.remove( entity );
 					}
 				}
 		);
 	}
 
-	public HqlSemanticTreeBuilder getHqlSemanticTreeBuilder() {
-		return hqlSemanticTreeBuilder;
-	}
-
-	public EntityManagerFactory getEntityManagerFactory() {
-		return emf;
-	}
-
 	public void performMultiExecutions() {
-		final EntityManager entityManager = getEntityManagerFactory().createEntityManager();
-
-		try {
-			final TypedQuery<CompositionEntity> query1 = entityManager.createQuery(
+		try ( final PersistenceContext pc = versionSupport.createPersistenceContext() ) {
+			final QueryProxy<CompositionEntity> query1 = pc.createQuery(
 					"select e from CompositionEntity e where e.description = :description",
 					CompositionEntity.class
 			);
@@ -198,7 +165,7 @@ public class BenchmarkState {
 			assert "first".equals( result1.getDescription() );
 
 
-			final TypedQuery<String> query2 = entityManager.createQuery(
+			final QueryProxy<String> query2 = pc.createQuery(
 					"select e.description from CompositionEntity e where e.description = :description",
 					String.class
 			);
@@ -208,7 +175,7 @@ public class BenchmarkState {
 			assert "first".equals( result2 );
 
 
-			final TypedQuery<Component> query3 = entityManager.createQuery(
+			final QueryProxy<Component> query3 = pc.createQuery(
 					"select e.component from CompositionEntity e where e.description = :description",
 					Component.class
 			);
@@ -217,15 +184,5 @@ public class BenchmarkState {
 			assert result3 != null;
 			assert "root - 1".equals( result3.getText() );
 		}
-		finally {
-			// in this block we know creation of the EM succeeded, so close it
-			try {
-				entityManager.close();
-			}
-			catch (Exception e) {
-				// ignore this here
-			}
-		}
-
 	}
 }

@@ -37,3 +37,8 @@ gradlew jmh
 ```
 
 
+== Java Flight Recorder / Mission Control
+
+* Launch Mission Control
+* Start benchmark
+* Start recording the JVM running the benchmark (should be the forked jmh one)

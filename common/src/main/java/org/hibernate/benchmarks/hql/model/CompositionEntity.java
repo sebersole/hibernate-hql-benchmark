@@ -6,19 +6,24 @@
  */
 package org.hibernate.benchmarks.hql.model;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 /**
  * @author Steve Ebersole
  */
-@Entity
-@Table( name = "composition_entity")
+@jakarta.persistence.Entity
+@jakarta.persistence.Table( name = "composition_entity")
+@javax.persistence.Entity
+@javax.persistence.Table( name = "composition_entity")
 public class CompositionEntity {
+	@jakarta.persistence.Id
+	@javax.persistence.Id
 	private Integer id;
+
+	@jakarta.persistence.Basic
+	@javax.persistence.Basic
 	private String description;
+
+	@jakarta.persistence.Embedded
+	@javax.persistence.Embedded
 	private Component component;
 
 	public CompositionEntity() {
@@ -33,7 +38,6 @@ public class CompositionEntity {
 		this.component = component;
 	}
 
-	@Id
 	public Integer getId() {
 		return id;
 	}
@@ -50,7 +54,6 @@ public class CompositionEntity {
 		this.description = description;
 	}
 
-	@Embedded
 	public Component getComponent() {
 		return component;
 	}

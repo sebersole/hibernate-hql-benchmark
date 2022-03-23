@@ -7,10 +7,7 @@
 package org.hibernate.benchmarks.hql;
 
 import java.util.concurrent.TimeUnit;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 
-import org.hibernate.benchmarks.hql.model.Component;
 import org.hibernate.benchmarks.hql.model.CompositionEntity;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -35,24 +32,14 @@ public class BenchmarkTests {
 	@BenchmarkMode( Mode.AverageTime )
 	@OutputTimeUnit(TimeUnit.MICROSECONDS)
 	public void simplePathPredicateExecution(BenchmarkState state) {
-		final EntityManager entityManager = state.getEntityManagerFactory().createEntityManager();
-		try {
-			final TypedQuery<CompositionEntity> query = entityManager.createQuery(
+		try ( PersistenceContext pc = state.getPersistenceContextAccess().get() ) {
+			final QueryProxy<CompositionEntity> query = pc.createQuery(
 					"select e from CompositionEntity e where e.description = :description",
 					CompositionEntity.class
 			);
 			final CompositionEntity result = query.setParameter( "description", "first" ).getSingleResult();
 			assert result != null;
 			assert "first".equals( result.getDescription() );
-		}
-		finally {
-			// in this block we know creation of the EM succeeded, so close it
-			try {
-				entityManager.close();
-			}
-			catch (Exception e) {
-				// ignore this here
-			}
 		}
 	}
 

@@ -6,13 +6,11 @@
  */
 package org.hibernate.benchmarks.hql.model;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
-
 /**
  * @author Steve Ebersole
  */
-@Embeddable
+@jakarta.persistence.Embeddable
+@javax.persistence.Embeddable
 public class Component {
 	private String text;
 	private Component2 subComponent;
@@ -29,7 +27,8 @@ public class Component {
 		this.subComponent = subComponent;
 	}
 
-	@Embedded
+	@jakarta.persistence.Embedded
+	@javax.persistence.Embedded
 	public Component2 getSubComponent() {
 		return subComponent;
 	}

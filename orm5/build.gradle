@@ -4,5 +4,10 @@ apply from: rootProject.file( 'gradle/benchmark-module.gradle' )
 sourceCompatibility = 1.8
 
 dependencies {
-    implementation libraries.orm5
+    def jaxbVersion = '2.3.1'
+
+    implementation 'org.hibernate:hibernate-core:5.3.8.Final'
+    implementation "javax.xml.bind:jaxb-api:${jaxbVersion}"
+
+    runtimeOnly "org.glassfish.jaxb:jaxb-runtime:${jaxbVersion}"
 }

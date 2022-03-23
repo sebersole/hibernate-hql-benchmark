@@ -1,12 +1,21 @@
 apply from: rootProject.file( 'gradle/benchmark-module.gradle' )
 
-sourceCompatibility = 1.8
-
 repositories {
-    // because I cannot do releases :(
+    mavenCentral()
+    // pick up BENCHMARK versions
     mavenLocal()
 }
 
 dependencies {
-    implementation libraries.orm6
+    def orm6Version = '6.0.0.BENCHMARK'
+
+    if ( project.hasProperty( 'orm6_version' ) ) {
+        orm6Version = project.property( 'orm6_version' )
+    }
+
+    if ( System.getProperty('orm6_version' ) != null ) {
+        orm6Version = System.getProperty( 'orm6_version' )
+    }
+
+    implementation "org.hibernate.orm:hibernate-core:${orm6Version}"
 }

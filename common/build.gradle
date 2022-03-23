@@ -11,5 +11,6 @@ repositories {
 }
 
 dependencies {
-    implementation libraries.jpa
+    compileOnly libraries.jakarta_jpa
+    compileOnly libraries.jpa
 }

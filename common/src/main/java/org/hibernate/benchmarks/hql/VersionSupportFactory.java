@@ -7,7 +7,7 @@
 package org.hibernate.benchmarks.hql;
 
 /**
- * Factory for HibernateVersionSupport instances.  Used with Java's
+ * Factory for VersionSupport instances.  Used with Java's
  * {@link java.util.ServiceLoader} support.
  *
  * @author Steve Ebersole
@@ -16,5 +16,5 @@ public interface VersionSupportFactory {
 	/**
 	 * Build the version support object
 	 */
-	HibernateVersionSupport buildHibernateVersionSupport();
+	VersionSupport buildVersionSupport();
 }
