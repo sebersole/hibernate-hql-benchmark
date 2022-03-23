@@ -4,10 +4,6 @@ buildscript {
     }
 }
 
-plugins {
-    id "me.champeau.gradle.jmh" version "0.5.3" apply false
-}
-
 task jmh {
     // NOTE this is not the jmh task from the jmh plugin.  It is merely a "grouping task"
     // for things to do when the benchmarks are run from the root - mainly creating a
@@ -28,14 +24,6 @@ task jmh {
 // NOTE : the benchmark project also define a `benchmark` alias for the `jmh`
 // task.  Allow that to be run from the root as well.
 task benchmark( dependsOn: [tasks.jmh] )
-
-allprojects {
-    group 'org.hibernate.sebersole.benchmarks'
-    version '1.0-SNAPSHOT'
-}
-
-final String GRADLEW = 'gradlew'
-final String GRADLEW_BAT = GRADLEW + '.bat'
 
 wrapper {
     gradleVersion = '6.9'

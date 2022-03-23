@@ -8,6 +8,14 @@ benchmark sub-project :(
 
 NOTE: In all cases, `gradlew benchmark` can be substituted for `gradlew jmh`
 
+[NOTE]
+====
+To run just a single benchmark test, use the `benchmark_inclusions` project property, e.g.
+
+```
+gradlew :orm6:jmh -Pbenchmark_inclusions="BenchmarkTests.multiExecution"
+```
+====
 
 == Hibernate ORM 6 testing
 

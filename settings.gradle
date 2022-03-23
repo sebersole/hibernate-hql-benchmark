@@ -1,8 +1,6 @@
-//pluginManagement {
-//	plugins {
-//		id 'me.champeau.gradle.jmh' version '0.4.8'
-//	}
-//}
+plugins {
+    id 'me.champeau.gradle.jmh' version '0.5.3' apply false
+}
 
 rootProject.name = 'jmh-shared-test-poc'
 

@@ -1,6 +1,4 @@
-
 apply from: rootProject.file( 'gradle/java-module.gradle' )
-
 apply plugin: 'me.champeau.gradle.jmh'
 
 dependencies {
@@ -41,6 +39,16 @@ ext {
 
 // JMH for `avgt` profiling
 jmh {
+	def inclusionsArgName = 'benchmark_inclusions'
+	def inclusionsSelector = project.hasProperty(inclusionsArgName)
+			? project.property(inclusionsArgName) as String
+			: null
+
+	if ( inclusionsSelector != null ) {
+		logger.lifecycle "Inclusion selector : `${inclusionsSelector}`"
+		include = [ inclusionsSelector ]
+	}
+
 	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
 //	jvmArgsAppend = [ '-XX:+UnlockDiagnosticVMOptions',  '-XX:+DebugNonSafepoints',  '-XX:+UnlockCommercialFeatures' ]
 
