@@ -1,3 +1,5 @@
+import static java.util.Collections.emptyList
+
 apply from: rootProject.file( 'gradle/java-module.gradle' )
 apply plugin: 'me.champeau.gradle.jmh'
 
@@ -39,19 +41,6 @@ ext {
 
 // JMH for `avgt` profiling
 jmh {
-	def inclusionsArgName = 'benchmark_inclusions'
-	def inclusionsSelector = project.hasProperty(inclusionsArgName)
-			? project.property(inclusionsArgName) as String
-			: null
-
-	if ( inclusionsSelector != null ) {
-		logger.lifecycle "Inclusion selector : `${inclusionsSelector}`"
-		include = [ inclusionsSelector ]
-	}
-
-	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
-//	jvmArgsAppend = [ '-XX:+UnlockDiagnosticVMOptions',  '-XX:+DebugNonSafepoints',  '-XX:+UnlockCommercialFeatures' ]
-
 	benchmarkMode = ['avgt']
 
 	iterations = 20 //default 10
@@ -62,6 +51,33 @@ jmh {
 
 	resultsFile = jmhReportJsonFile
 	resultFormat = 'JSON'
+
+	def inclusionsSelector = locateProperty( 'benchmark_inclusions' )
+	if ( inclusionsSelector != null ) {
+		logger.lifecycle "Inclusion selector : `${inclusionsSelector}`"
+		include = [ inclusionsSelector ]
+	}
+
+	// for available options, see https://github.com/melix/jmh-gradle-plugin/blob/master/README.adoc#configuration-options
+//	jvmArgsAppend = [ '-XX:+UnlockDiagnosticVMOptions',  '-XX:+DebugNonSafepoints',  '-XX:+UnlockCommercialFeatures' ]
+
+	def profilers = locateListProperty( "profilers" )
+	if ( !profilers.empty ) {
+		logger.lifecycle "Profilers : `{}`", profilers
+		it.profilers = profilers
+	}
+	else {
+		it.profilers = []
+	}
+
+	def jvmArguments = locateListProperty( "jvm_args" )
+	if ( ! jvmArguments.empty ) {
+		logger.lifecycle "JVM args : `{}`", jvmArguments
+		jvmArgsAppend = jvmArguments
+	}
+	else {
+		jvmArgsAppend = []
+	}
 }
 
 
@@ -83,6 +99,28 @@ jmh {
 //	resultsFile = jmhReportJsonFile
 //	resultFormat = 'JSON'
 //}
+
+List<String> locateListProperty(String propertyName) {
+	def propertyValue = locateProperty( propertyName )
+	if ( propertyValue == null ) {
+		return emptyList()
+	}
+
+	return propertyValue.split(",")*.trim()
+}
+
+String locateProperty(String propertyName) {
+	if ( project.hasProperty( propertyName ) ) {
+		return project.property( propertyName )
+	}
+
+	def sysProp = System.getProperty( propertyName )
+	if ( sysProp != null ) {
+		return sysProp
+	}
+
+	return null
+}
 
 task benchmark( dependsOn: [tasks.jmh] ) {
 	description = "Alias for the JMH task"
