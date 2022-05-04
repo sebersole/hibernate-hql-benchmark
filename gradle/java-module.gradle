@@ -21,10 +21,8 @@ apply plugin: 'java'
 apply plugin: 'build-dashboard'
 apply plugin: 'project-report'
 
-apply from: rootProject.file( 'gradle/libraries.gradle' )
-
 dependencies {
-	implementation libraries.jmh
+	implementation libs.jmh
 }
 
 task compile {

@@ -6,9 +6,8 @@ apply plugin: 'me.champeau.gradle.jmh'
 dependencies {
 	implementation project( ':common' )
 
-	implementation libraries.jpa
-
-	runtimeOnly libraries.h2
+	runtimeOnly dbLibs.h2
+	runtimeOnly dbLibs.postgresql
 }
 
 ext {
@@ -38,6 +37,8 @@ ext {
 		initialRandomizerSetting = determineInitialSetting( "/proc/sys/kernel/randomize_va_space", runtime )
 	}
 }
+
+tasks.processJmhResources.duplicatesStrategy = DuplicatesStrategy.WARN
 
 // JMH for `avgt` profiling
 jmh {

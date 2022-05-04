@@ -8,3 +8,36 @@ include 'common'
 include 'orm6'
 include 'orm5'
 
+// version catalog support
+//      - https://docs.gradle.org/7.3.3/userguide/platforms.html#sub:central-declaration-of-dependencies
+enableFeaturePreview("VERSION_CATALOGS")
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+
+    versionCatalogs {
+        libs {
+            version( "jmh", "1.21" )
+            version( "logging", "3.3.2.Final" )
+
+            alias( "jmh" ).to( "org.openjdk.jmh", "jmh-core" ).versionRef( "jmh" )
+            alias( "logging" ).to( "org.jboss.logging", "jboss-logging" ).versionRef( "logging" )
+        }
+        jpaLibs {
+            version( "javax", "2.2" )
+            version( "jakarta", "3.0.0" )
+
+            alias( "javax" ).to( "javax.persistence", "javax.persistence-api" ).versionRef( "javax" )
+            alias( "jakarta" ).to( "jakarta.persistence", "jakarta.persistence-api" ).versionRef( "jakarta" )
+        }
+        dbLibs {
+            version( "h2", "2.1.210" )
+            version( "pgsql", "42.2.16" )
+
+            alias( "h2" ).to( "com.h2database", "h2" ).versionRef( "h2" )
+            alias( "postgresql" ).to( "org.postgresql", "postgresql" ).versionRef( "pgsql" )
+        }
+    }
+}

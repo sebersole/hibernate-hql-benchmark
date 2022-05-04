@@ -26,8 +26,8 @@ task jmh {
 task benchmark( dependsOn: [tasks.jmh] )
 
 wrapper {
-    gradleVersion = '6.9'
-    distributionType = Wrapper.DistributionType.ALL
+    // To upgrade the version of gradle used in the wrapper, run:
+    //     gradlew wrapper --gradle-version NEW_VERSION
 }
 
 //Map<BenchmarkKey, BenchmarkScore> parseJson(File jsonFile) {
