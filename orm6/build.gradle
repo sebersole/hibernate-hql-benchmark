@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-    def orm6Version = '6.0.0.BENCHMARK'
+    def orm6Version = '6.0.0.Final'
 
     if ( project.hasProperty( 'orm6_version' ) ) {
         orm6Version = project.property( 'orm6_version' )

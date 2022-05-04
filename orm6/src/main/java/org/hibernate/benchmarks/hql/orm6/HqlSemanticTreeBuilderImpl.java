@@ -25,6 +25,6 @@ public class HqlSemanticTreeBuilderImpl implements HqlSemanticTreeBuilder {
 
 	@Override
 	public Object buildSemanticModel(String hqlString) {
-		return sessionFactory.getQueryEngine().getHqlTranslator().translate( hqlString );
+		return sessionFactory.getQueryEngine().getHqlTranslator().translate( hqlString, null );
 	}
 }
